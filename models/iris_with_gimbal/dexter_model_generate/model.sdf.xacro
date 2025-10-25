@@ -1,0 +1,133 @@
+<?xml version='1.0'?>
+<xacro:sdf version="1.9" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="macro_lift_drag_plugin" params="cp_x rotor_id cw">
+    <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.0</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.23</area>
+      <air_density>1.2041</air_density>
+      <cp>${cp_x} 0 0</cp>
+      <xacro:if value="${cw}">
+        <forward>0 -1 0</forward>
+      </xacro:if>
+      <xacro:unless value="${cw}">
+        <forward>0 1 0</forward>
+      </xacro:unless>
+      <upward>0 0 1</upward>
+      <link_name>iris_with_standoffs::rotor_${rotor_id}</link_name>
+    </plugin>
+    <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
+      <a0>0.3</a0>
+      <alpha_stall>1.4</alpha_stall>
+      <cla>4.2500</cla>
+      <cda>0.10</cda>
+      <cma>0.0</cma>
+      <cla_stall>-0.025</cla_stall>
+      <cda_stall>0.0</cda_stall>
+      <cma_stall>0.0</cma_stall>
+      <area>0.23</area>
+      <air_density>1.2041</air_density>
+      <cp>${-cp_x} 0 0</cp>
+      <xacro:if value="${cw}">
+        <forward>0 1 0</forward>
+      </xacro:if>
+      <xacro:unless value="${cw}">
+        <forward>0 -1 0</forward>
+      </xacro:unless>
+      <upward>0 0 1</upward>
+      <link_name>iris_with_standoffs::rotor_${rotor_id}</link_name>
+    </plugin>
+  </xacro:macro>
+
+  <xacro:macro name="macro_apply_joint_force" params="rotor_id">
+    <plugin filename="gz-sim-apply-joint-force-system"
+      name="gz::sim::systems::ApplyJointForce">
+      <joint_name>iris_with_standoffs::rotor_${rotor_id}_joint</joint_name>
+    </plugin>
+  </xacro:macro>
+
+  <xacro:macro name="rotor_control" params="channel joint_id multiplier">
+    <control channel="${channel}">
+      <jointName>iris_with_standoffs::rotor_${joint_id}_joint</jointName>
+      <useForce>1</useForce>
+      <multiplier>${multiplier}</multiplier>
+      <offset>0</offset>
+      <servo_min>1100</servo_min>
+      <servo_max>1900</servo_max>
+      <type>VELOCITY</type>
+      <p_gain>0.20</p_gain>
+      <i_gain>0</i_gain>
+      <d_gain>0</d_gain>
+      <i_max>0</i_max>
+      <i_min>0</i_min>
+      <cmd_max>2.5</cmd_max>
+      <cmd_min>-2.5</cmd_min>
+      <controlVelocitySlowdownSim>1</controlVelocitySlowdownSim>
+    </control>
+  </xacro:macro>
+
+  <model name="iris_with_gimbal">
+    <include>
+      <uri>model://iris_with_standoffs</uri>
+    </include>
+
+    <!-- plugins -->
+    <plugin filename="gz-sim-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher">
+    </plugin>
+
+    <xacro:macro_lift_drag_plugin cp_x="0.084" rotor_id="0" cw="true"/>
+    <xacro:macro_lift_drag_plugin cp_x="0.084" rotor_id="1" cw="false"/>
+    <xacro:macro_lift_drag_plugin cp_x="0.084" rotor_id="2" cw="true"/>
+    <xacro:macro_lift_drag_plugin cp_x="0.084" rotor_id="3" cw="false"/>
+    <xacro:macro_lift_drag_plugin cp_x="0.084" rotor_id="4" cw="false"/>
+    <xacro:macro_lift_drag_plugin cp_x="0.084" rotor_id="5" cw="true"/>
+
+    <xacro:macro_apply_joint_force rotor_id="0"/>
+    <xacro:macro_apply_joint_force rotor_id="1"/>
+    <xacro:macro_apply_joint_force rotor_id="2"/>
+    <xacro:macro_apply_joint_force rotor_id="3"/>
+    <xacro:macro_apply_joint_force rotor_id="4"/>
+    <xacro:macro_apply_joint_force rotor_id="5"/>
+
+    <plugin name="ArduPilotPlugin"
+      filename="ArduPilotPlugin">
+      <!-- Port settings -->
+      <fdm_addr>127.0.0.1</fdm_addr>
+      <fdm_port_in>9002</fdm_port_in>
+      <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
+      <lock_step>1</lock_step>
+
+      <!-- Frame conventions
+        Require by ArduPilot: change model and gazebo from XYZ to XY-Z coordinates
+      -->
+      <modelXYZToAirplaneXForwardZDown degrees="true">0 0 0 180 0 0</modelXYZToAirplaneXForwardZDown>
+      <gazeboXYZToNED degrees="true">0 0 0 180 0 90</gazeboXYZToNED>
+
+      <!-- Sensors -->
+      <imuName>iris_with_standoffs::imu_link::imu_sensor</imuName>
+
+      <!--
+          incoming control command [0, 1]
+          so offset it by 0 to get [0, 1]
+          and divide max target by 1.
+          offset = 0
+          multiplier = 838 max rpm / 1 = 838
+        -->
+
+      <xacro:rotor_control channel="0" joint_id="0" multiplier="-838"/>
+      <xacro:rotor_control channel="1" joint_id="1" multiplier="838"/>
+      <xacro:rotor_control channel="2" joint_id="2" multiplier="-838"/>
+      <xacro:rotor_control channel="3" joint_id="3" multiplier="838"/>
+      <xacro:rotor_control channel="4" joint_id="4" multiplier="838"/>
+      <xacro:rotor_control channel="5" joint_id="5" multiplier="-838"/>
+    </plugin>
+  </model>
+</xacro:sdf>

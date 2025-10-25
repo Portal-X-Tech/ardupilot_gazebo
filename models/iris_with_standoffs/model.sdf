@@ -2,6 +2,7 @@
 <sdf version='1.9'>
   <model name='iris_with_standoffs'>
     <pose>0 0 0 0 0 0</pose>
+
     <link name='base_link'>
       <velocity_decay>
         <linear>0.0</linear>
@@ -9,21 +10,21 @@
       </velocity_decay>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>1.5</mass>
+        <mass>10</mass>
         <inertia>
-          <ixx>0.008</ixx>
+          <ixx>2.43</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.015</iyy>
+          <iyy>2.7</iyy>
           <iyz>0</iyz>
-          <izz>0.017</izz>
+          <izz>4.54</izz>
         </inertia>
       </inertial>
       <collision name='base_collision'>
-        <pose>0 0 -0.08 0 0 0</pose>
+        <pose>0 0 -0.13 0 0 0</pose>
         <geometry>
           <box>
-            <size>0.47 0.47 0.23</size>
+            <size>1.7 1.6 0.6</size>
           </box>
         </geometry>
         <surface>
@@ -44,7 +45,7 @@
       <visual name='base_visual'>
         <geometry>
           <mesh>
-            <uri>model://iris_with_standoffs/meshes/iris.dae</uri>
+            <uri>model://iris_with_standoffs/meshes/dexter_base.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -59,88 +60,8 @@
           </pbr>
         </material>
       </visual>
-
-      <visual name='front_left_leg_visual'>
-        <pose>0.123 0.22 -0.11 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.005</radius>
-            <length>0.17</length>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>0.05 0.05 0.05</ambient>
-          <diffuse>0.05 0.05 0.05</diffuse>
-          <specular>0.01 0.01 0.01 1.0</specular>
-          <pbr>
-            <metal>
-              <metalness>0.5</metalness>
-              <roughness>0.5</roughness>
-            </metal>
-          </pbr>
-        </material>
-      </visual>
-      <visual name='front_right_leg_visual'>
-        <pose>0.123 -0.22 -0.11 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.005</radius>
-            <length>0.17</length>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>0.05 0.05 0.05</ambient>
-          <diffuse>0.05 0.05 0.05</diffuse>
-          <specular>0.01 0.01 0.01 1.0</specular>
-          <pbr>
-            <metal>
-              <metalness>0.5</metalness>
-              <roughness>0.5</roughness>
-            </metal>
-          </pbr>
-        </material>
-      </visual>
-      <visual name='rear_left_leg_visual'>
-        <pose>-0.140 0.21 -0.11 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.005</radius>
-            <length>0.17</length>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>0.05 0.05 0.05</ambient>
-          <diffuse>0.05 0.05 0.05</diffuse>
-          <specular>0.01 0.01 0.01 1.0</specular>
-          <pbr>
-            <metal>
-              <metalness>0.5</metalness>
-              <roughness>0.5</roughness>
-            </metal>
-          </pbr>
-        </material>
-      </visual>
-      <visual name='rear_right_leg_visual'>
-        <pose>-0.140 -0.21 -0.11 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.005</radius>
-            <length>0.17</length>
-          </cylinder>
-        </geometry>
-        <material>
-          <ambient>0.05 0.05 0.05</ambient>
-          <diffuse>0.05 0.05 0.05</diffuse>
-          <specular>0.01 0.01 0.01 1.0</specular>
-          <pbr>
-            <metal>
-              <metalness>0.5</metalness>
-              <roughness>0.5</roughness>
-            </metal>
-          </pbr>
-        </material>
-      </visual>
     </link>
+
     <link name='imu_link'>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
@@ -176,8 +97,129 @@
         </dynamics>
       </axis>
     </joint>
+
+    <joint name="lidar_left_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>lidar_left_link</child>
+    </joint>
+
+    <link name='lidar_left_link'>
+      <pose relative_to="base_link">0.0445 -0.215 0.055 0 -0.174533 -1.047197</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00002</iyy>
+          <iyz>0</iyz>
+          <izz>0.00002</izz>
+        </inertia>
+      </inertial>
+
+      <visual name='lidar_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <!-- simple cylindrical shap -->
+        <geometry>
+          <cylinder>
+            <length>0.01</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+
+      <sensor name="gpu_lidar" type="gpu_lidar">
+        <topic>lidar_left</topic>
+        <update_rate>10</update_rate>
+        <ray>
+            <scan>
+                <horizontal>
+                    <samples>1</samples>
+                    <resolution>1</resolution>
+                    <min_angle>0</min_angle>
+                    <max_angle>0</max_angle>
+                </horizontal>
+                <vertical>
+                    <samples>1</samples>
+                    <resolution>0.01</resolution>
+                    <min_angle>0</min_angle>
+                    <max_angle>0</max_angle>
+                </vertical>
+            </scan>
+            <range>
+                <min>0.08</min>
+                <max>10.0</max>
+                <resolution>0.01</resolution>
+            </range>
+        </ray>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+      </sensor>
+    </link>
+
+    <joint name="lidar_right_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>lidar_right_link</child>
+    </joint>
+
+    <link name='lidar_right_link'>
+      <pose relative_to="base_link">-0.0445 -0.215 0.055 0 -0.174533 -2.094395</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.15</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00002</iyy>
+          <iyz>0</iyz>
+          <izz>0.00002</izz>
+        </inertia>
+      </inertial>
+
+      <visual name='lidar_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <!-- simple cylindrical shap -->
+        <geometry>
+          <cylinder>
+            <length>0.01</length>
+            <radius>0.01</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+
+      <sensor name="gpu_lidar" type="gpu_lidar">
+        <topic>lidar_right</topic>
+        <update_rate>10</update_rate>
+        <ray>
+            <scan>
+                <horizontal>
+                    <samples>1</samples>
+                    <resolution>1</resolution>
+                    <min_angle>0</min_angle>
+                    <max_angle>0</max_angle>
+                </horizontal>
+                <vertical>
+                    <samples>1</samples>
+                    <resolution>0.01</resolution>
+                    <min_angle>0</min_angle>
+                    <max_angle>0</max_angle>
+                </vertical>
+            </scan>
+            <range>
+                <min>0.08</min>
+                <max>10.0</max>
+                <resolution>0.01</resolution>
+            </range>
+        </ray>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+      </sensor>
+    </link>
+
     <link name='rotor_0'>
-      <pose>0.13 -0.22 0.023 0 0 0</pose>
+      <pose>-0.6 0 0.026 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.025</mass>
@@ -194,8 +236,8 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
+            <length>0.025</length>
+            <radius>0.27</radius>
           </cylinder>
         </geometry>
         <surface>
@@ -212,12 +254,12 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris_with_standoffs/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://iris_with_standoffs/meshes/dexter_prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
-          <ambient>0 0 1</ambient>
-          <diffuse>0 0 1</diffuse>
+          <ambient>0 1 0</ambient>
+          <diffuse>0 1 0</diffuse>
           <specular>1 1 1 1</specular>
           <pbr>
             <metal>
@@ -251,7 +293,7 @@
       </physics>
     </joint>
     <link name='rotor_1'>
-      <pose>-0.13 0.2 0.023 0 0 0</pose>
+      <pose>0.6 0 0.026 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.025</mass>
@@ -268,8 +310,8 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
+            <length>0.025</length>
+            <radius>0.26</radius>
           </cylinder>
         </geometry>
         <surface>
@@ -286,7 +328,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris_with_standoffs/meshes/iris_prop_ccw.dae</uri>
+            <uri>model://iris_with_standoffs/meshes/dexter_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -325,7 +367,7 @@
       </physics>
     </joint>
     <link name='rotor_2'>
-      <pose>0.13 0.22 0.023 0 0 0</pose>
+      <pose>0.3 -0.52 0.026 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.025</mass>
@@ -342,8 +384,8 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
+            <length>0.025</length>
+            <radius>0.26</radius>
           </cylinder>
         </geometry>
         <surface>
@@ -360,7 +402,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris_with_standoffs/meshes/iris_prop_cw.dae</uri>
+            <uri>model://iris_with_standoffs/meshes/dexter_prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -399,7 +441,7 @@
       </physics>
     </joint>
     <link name='rotor_3'>
-      <pose>-0.13 -0.2 0.023 0 0 0</pose>
+      <pose>-0.3 0.52 0.026 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.025</mass>
@@ -416,8 +458,8 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
-            <length>0.005</length>
-            <radius>0.1</radius>
+            <length>0.025</length>
+            <radius>0.26</radius>
           </cylinder>
         </geometry>
         <surface>
@@ -434,12 +476,12 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://iris_with_standoffs/meshes/iris_prop_cw.dae</uri>
+            <uri>model://iris_with_standoffs/meshes/dexter_prop_ccw.dae</uri>
           </mesh>
         </geometry>
         <material>
-          <ambient>0 1 0</ambient>
-          <diffuse>0 1 0</diffuse>
+          <ambient>0 0 1 1</ambient>
+          <diffuse>0 0 1 1</diffuse>
           <specular>1 1 1 1</specular>
           <pbr>
             <metal>
@@ -472,5 +514,154 @@
         </ode>
       </physics>
     </joint>
+    <link name='rotor_4'>
+      <pose>-0.3 -0.52 0.026 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.025</mass>
+        <inertia>
+          <ixx>9.75e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_4_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.025</length>
+            <radius>0.26</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_4_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://iris_with_standoffs/meshes/dexter_prop_ccw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0 0 1 1</ambient>
+          <diffuse>0 0 1 1</diffuse>
+          <specular>1 1 1 1</specular>
+          <pbr>
+            <metal>
+              <metalness>0.5</metalness>
+              <roughness>0.5</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+    <joint name='rotor_4_joint' type='revolute'>
+      <child>rotor_4</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0.004</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+    <link name='rotor_5'>
+      <pose>0.3 0.52 0.026 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.025</mass>
+        <inertia>
+          <ixx>9.75e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.000166704</iyy>
+          <iyz>0</iyz>
+          <izz>0.000167604</izz>
+        </inertia>
+      </inertial>
+      <collision name='rotor_5_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.025</length>
+            <radius>0.26</radius>
+          </cylinder>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rotor_5_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://iris_with_standoffs/meshes/dexter_prop_cw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0 1 0</ambient>
+          <diffuse>0 1 0</diffuse>
+          <specular>1 1 1 1</specular>
+          <pbr>
+            <metal>
+              <metalness>0.5</metalness>
+              <roughness>0.5</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay/>
+      <self_collide>0</self_collide>
+    </link>
+    <joint name='rotor_5_joint' type='revolute'>
+      <child>rotor_5</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0.004</damping>
+        </dynamics>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
   </model>
 </sdf>
