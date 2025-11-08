@@ -112,19 +112,17 @@
 
     <include>
       <uri>model://runway</uri>
-      <pose degrees="true">-29 545 0 0 0 363</pose>
+      <pose degrees="true">-29 545 0 0 0 0</pose>
     </include>
 
     <include>
-      <uri>file://home/portal/mnt/ws/src/ardupilot_gazebo/models/iris_with_gimbal/dexter_model_generate/drone1.sdf</uri>
-      <name>drone1</name>
-      <pose degrees="true">0 1 1 0 0 90</pose>
+      <uri>model://nb_park</uri>
+      <pose degrees="true">-17 -30 22 0 0 0</pose>
     </include>
 
     <include>
-      <uri>file://home/portal/mnt/ws/src/ardupilot_gazebo/models/iris_with_gimbal/dexter_model_generate/drone2.sdf</uri>
-      <name>drone2</name>
-      <pose degrees="true">0 -1 1 0 0 90</pose>
+      <uri>model://iris_with_gimbal</uri>
+      <pose degrees="true">0 0 1 0 0 90</pose>
     </include>
 
   </world>
